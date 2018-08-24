@@ -1,0 +1,18 @@
+{
+  "name": "aya-day-weather-proxy",
+  "version": "1.0.0",
+  "description": "A proxy to get the weather",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AYA-Experience",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "dependencies": {
+    "@koa/cors": "^2.2.2",
+    "axios": "^0.18.0",
+    "koa": "^2.5.2",
+    "koa-router": "^7.4.0"
+  }
+}
