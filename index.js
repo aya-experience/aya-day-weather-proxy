@@ -18,7 +18,7 @@ router.get('/', async (ctx, next) => {
         {name: 'Bordeaux', lat: '44.8766633', lon: '-0.5799973000000591'},
         {name: 'Grenoble', lat: '45.1908938', lon: '5.713198299999931'},
         {name: 'Singapour', lat: '1.2780362', lon: '103.84973250000007'},
-        {name: 'Monréal', lat: '45.50205700000001', lon: '-73.569345'}
+        {name: 'Montréal', lat: '45.50205700000001', lon: '-73.569345'}
       ];
 
   if(!agenciesData) {
