@@ -10,6 +10,12 @@ let agenciesData;
 
 const API_KEY = process.env.API_KEY;
 
+router.get('/health', (ctx, next) => {
+  ctx.status = 200;
+  ctx.body = '';
+  return next();
+});
+
 router.get('/', async (ctx, next) => {
   const zenikaAgencies = [
     { name: 'Paris', lat: '48.8790132', lon: '2.3284880999999586' },
