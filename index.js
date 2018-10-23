@@ -1,22 +1,19 @@
 const Koa = require('koa');
+
 const app = new Koa();
 const Router = require('koa-router');
 const axios = require('axios');
 const cors = require('@koa/cors');
 
-var router = new Router();
+const router = new Router();
 
-let agenciesData;
+// Agency weather data
+let agenciesData = null;
 
-const API_KEY = process.env.API_KEY;
+const { API_KEY } = process.env;
 
-router.get('/health', (ctx, next) => {
-  ctx.status = 200;
-  ctx.body = '';
-  return next();
-});
-
-router.get('/', async (ctx, next) => {
+// Get weather data for all agencies
+async function getWeatherData() {
   const zenikaAgencies = [
     { name: 'Paris', lat: '48.8790132', lon: '2.3284880999999586' },
     { name: 'Lyon', lat: '45.76216030000001', lon: '4.862302499999942' },
@@ -29,32 +26,47 @@ router.get('/', async (ctx, next) => {
     { name: 'Montréal', lat: '45.50205700000001', lon: '-73.569345' },
   ];
 
-  if (!agenciesData) {
-    const agencies = await Promise.all(
-      zenikaAgencies.map((zenikaAgencie) => {
-        return axios.get(
-          `https://api.darksky.net/forecast/${API_KEY}/${zenikaAgencie.lat},${zenikaAgencie.lon}`,
-        );
-      }),
-    )
-      .then((weatherDatas) => {
-        return zenikaAgencies.map((zenikaAgencie, i) => {
-          return {
-            ...zenikaAgencie,
-            weather: weatherDatas[i].data,
-          };
-        });
-      })
-      .catch(console.error.bind(console));
+  let agencies = await Promise.all(
+    zenikaAgencies.map(zenikaAgencie =>
+      axios.get(
+        `https://api.darksky.net/forecast/${API_KEY}/${zenikaAgencie.lat},${zenikaAgencie.lon}`,
+      ),
+    ),
+  );
 
-    agenciesData = agencies;
-    ctx.body = agencies;
-  } else {
-    ctx.body = agenciesData;
-  }
+  agencies = zenikaAgencies.map((zenikaAgencie, i) => {
+    return {
+      ...zenikaAgencie,
+      weather: agencies[i].data,
+    };
+  });
 
+  agenciesData = agencies;
+}
+
+router.get('/health', (ctx, next) => {
+  ctx.status = 200;
+  ctx.body = '';
   return next();
 });
+
+router.get('/', async (ctx, next) => {
+  // Check if we already have weather data
+  if (!agenciesData) {
+    // WE DON'T, get data and set it as the response body
+    await getWeatherData();
+    ctx.body = agenciesData;
+  } else {
+    // WE DO, set it as the response body
+    ctx.body = agenciesData;
+  }
+  return next();
+});
+
+// Every hour, update the weather data
+setInterval(() => {
+  getWeatherData();
+}, 3600000);
 
 app.use(cors());
 app.use(router.routes()).use(router.allowedMethods());
